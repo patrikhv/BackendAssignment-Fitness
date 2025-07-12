@@ -1,10 +1,13 @@
 import fs from 'fs'
 import { Sequelize } from 'sequelize'
+import dotenv from 'dotenv';
 
 import defineExercise from './exercise'
 import defineProgram from './program'
 
-const sequelize: Sequelize = new Sequelize('postgresql://localhost:5432/fitness_app', {
+dotenv.config();
+
+const sequelize: Sequelize = new Sequelize(process.env.DB_URL, {
 	logging: false
 })
 

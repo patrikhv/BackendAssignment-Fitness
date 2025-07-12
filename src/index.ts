@@ -1,14 +1,23 @@
 import http from 'http'
 import express from 'express'
+import dotenv from 'dotenv'
+// Load environment variables from .env file
+dotenv.config();
 
 import { sequelize } from './db'
 import ProgramRouter from './routes/programs'
 import ExerciseRouter from './routes/exercises'
+import AuthRouter from './routes/auth'
+import passport from "passport";
 
 const app = express()
 
+app.use(passport.initialize());
+
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+
+app.use('/auth', AuthRouter())
 app.use('/programs', ProgramRouter())
 app.use('/exercises', ExerciseRouter())
 

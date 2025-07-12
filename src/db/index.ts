@@ -1,11 +1,9 @@
 import fs from 'fs'
 import { Sequelize } from 'sequelize'
-import dotenv from 'dotenv';
 
 import defineExercise from './exercise'
 import defineProgram from './program'
-
-dotenv.config();
+import defineUser from './user'
 
 const sequelize: Sequelize = new Sequelize(process.env.DB_URL, {
 	logging: false
@@ -15,10 +13,12 @@ sequelize.authenticate().catch((e: any) => console.error(`Unable to connect to t
 
 const Exercise = defineExercise(sequelize, 'exercise')
 const Program = defineProgram(sequelize, 'program')
+const User = defineUser(sequelize, 'user')
 
 const models = {
 	Exercise,
-	Program
+	Program,
+	User
 }
 type Models = typeof models
 

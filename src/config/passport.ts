@@ -1,10 +1,8 @@
 import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
 import { AppJwtPayload } from '../types/jwt';
-import { models } from '../db'
 import passport from 'passport';
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const UserModel = models.User;
 
 if (!JWT_SECRET) {
     throw new Error('JWT_SECRET is not defined');
@@ -16,19 +14,9 @@ const options: StrategyOptions = {
 };
 
 passport.use(
-    new JwtStrategy(options, async (jwtPayload: AppJwtPayload, done) => {
-        try {
-            const user = await UserModel.findByPk(jwtPayload.id);
-            if (!user) return done(null, false);
-
-            // Attach user object to req.user
-            return done(null, {
-                id: user.id,
-                email: user.email,
-                role: user.role
-            });
-        } catch (err) {
-            return done(err, false);
-        }
+    new JwtStrategy(options, (jwtPayload: AppJwtPayload, done) => {
+        // cast jwtPayload.id to number - jwtLibrary returns it as string
+        jwtPayload.id = Number(jwtPayload.id);
+        return done(null, jwtPayload);
     })
 );

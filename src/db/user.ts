@@ -13,7 +13,7 @@ export interface UserModel extends Model {
 }
 
 export default (sequelize: Sequelize, modelName: string) => {
-    return sequelize.define<UserModel>(
+    const UserModelCtor =  sequelize.define<UserModel>(
         modelName,
         {
             id: {
@@ -63,4 +63,14 @@ export default (sequelize: Sequelize, modelName: string) => {
             tableName: 'users'
         }
     );
+
+    UserModelCtor.associate = (models) => {
+        UserModelCtor.belongsToMany(models.Exercise, {
+            through: models.UserExercise,
+            foreignKey: 'userId',
+            as: 'completedExercises'
+        });
+    };
+
+    return UserModelCtor;
 };

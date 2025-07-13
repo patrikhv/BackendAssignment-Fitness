@@ -1,4 +1,8 @@
-import { models, sequelize } from './db/index'
+import dotenv from 'dotenv'
+// Load environment variables from .env file
+dotenv.config();
+
+import { models, sequelize } from './db'
 import { EXERCISE_DIFFICULTY } from './utils/enums'
 
 const {

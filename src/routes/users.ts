@@ -3,6 +3,10 @@ import {UserService} from "../services/userService";
 import passport from "passport";
 import {requireRole} from "../middlewares/requireRole";
 import {USER_ROLE} from "../utils/enums";
+import {AppJwtPayload} from "../types/jwt";
+import {UnauthorizedError} from "../errors/appError";
+import {validate} from "../middlewares/validate";
+import {UserRegistrationRequestSchema} from "../types/user";
 
 
 const router = Router();
@@ -12,12 +16,18 @@ export default () => {
     router.get(
         '/',
         passport.authenticate('jwt', { session: false }),
-        requireRole(USER_ROLE.ADMIN),
         async (req, res, next) => {
             try {
-                const users = await UserService.getAll();
+                const user = req.user as AppJwtPayload;
+
+                if (!user?.role) {
+                    return next(new UnauthorizedError('User role is not defined'));
+                }
+
+                const result = await UserService.getAllForRole(user?.role);
+
                 res.json({
-                    data: users,
+                    data: result,
                     message: 'List of users'
                 });
             } catch (err) {
@@ -30,13 +40,19 @@ export default () => {
     router.get(
         '/:id',
         passport.authenticate('jwt', { session: false }),
-        requireRole(USER_ROLE.ADMIN),
         async (req, res, next) => {
             try {
                 const id = parseInt(req.params.id);
-                const user = await UserService.getById(id);
+
+                const user = req.user as AppJwtPayload;
+
+                if (user.role !== USER_ROLE.ADMIN && user.id !== id) {
+                    return next(new UnauthorizedError('You do not have permission to view this user'));
+                }
+
+                const userData = await UserService.getById(id, user.role);
                 res.json({
-                    data: user,
+                    data: userData,
                     message: 'User detail'
                 });
             } catch (err) {

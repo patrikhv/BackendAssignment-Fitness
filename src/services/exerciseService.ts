@@ -1,14 +1,41 @@
 import { models } from '../db';
 import {NotFoundError, ValidationError} from "../errors/appError";
-import {ExerciseDTO} from "../types/dto/exercise";
+import {ExerciseDto} from "../types/exercise";
+import {ExerciseQuery} from "../types/ExerciseQuerySchema";
+import {Op} from "sequelize";
 
 const { Exercise, Program } = models;
 
 export class ExerciseService {
-    static async getAllWithPrograms() {
-        return await Exercise.findAll({
-            include: [{ model: Program }]
+    static async getAllWithPrograms(query: ExerciseQuery) {
+        const { page, limit, programID, search } = query;
+        const offset = (page - 1) * limit;
+
+        const whereClause: any = {};
+
+        if (programID) {
+            whereClause.programID = programID;
+        }
+
+        if (search) {
+            whereClause.name = {
+                [Op.iLike]: `%${search}%`  // case-insensitive LIKE
+            };
+        }
+
+        const { rows, count } = await Exercise.findAndCountAll({
+            where: whereClause,
+            include: [{ model: Program }],
+            limit,
+            offset
         });
+
+        return {
+            entries: rows,
+            total: count,
+            page,
+            perPage: limit
+        };
     }
 
     static async getById(id: number) {
@@ -21,7 +48,7 @@ export class ExerciseService {
         return exercise;
     }
 
-    static async create(data: ExerciseDTO) {
+    static async create(data: ExerciseDto) {
         const { name, description, difficulty, programID } = data;
 
         if (!name || !description || !difficulty || !programID) {
@@ -32,11 +59,10 @@ export class ExerciseService {
         if (!program) {
             throw new NotFoundError('Program not found');
         }
-
-        return await Exercise.create({ name, description, difficulty, program });
+        return await Exercise.create({ name, description, difficulty, programID });
     }
 
-    static async update(id: number, data: ExerciseDTO) {
+    static async update(id: number, data: ExerciseDto) {
         const exercise = await Exercise.findByPk(id);
         if (!exercise) throw new NotFoundError('Exercise not found');
 
@@ -49,7 +75,7 @@ export class ExerciseService {
             throw new NotFoundError('Program not found');
         }
 
-        return await exercise.update({ name, description, difficulty, program });
+        return await exercise.update({ name, description, difficulty, programID });
     }
 
     static async delete(id: number) {

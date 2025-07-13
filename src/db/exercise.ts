@@ -27,7 +27,7 @@ export default (sequelize: Sequelize, modelName: string) => {
 			name: {
 				type: DataTypes.STRING(200),
 			}
-		}, 
+		},
 		{
 			paranoid: true,
 			timestamps: true,
@@ -39,9 +39,15 @@ export default (sequelize: Sequelize, modelName: string) => {
 		ExerciseModelCtor.belongsTo(models.Program, {
 			foreignKey: {
 				name: 'programID',
-				allowNull: false
+				allowNull: true
 			},
 		})
+
+		ExerciseModelCtor.belongsToMany(models.User, {
+			through: models.UserExercise,
+			foreignKey: 'exerciseId',
+			as: 'usersCompleted'
+		});
 	}
 
 	return ExerciseModelCtor

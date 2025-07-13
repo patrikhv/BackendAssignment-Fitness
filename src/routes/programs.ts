@@ -10,6 +10,7 @@ import {ProgramService} from "../services/programService";
 import passport from "passport";
 import {requireRole} from "../middlewares/requireRole";
 import {USER_ROLE} from "../utils/enums";
+import {ValidationError} from "../errors/appError";
 
 const router = Router()
 
@@ -35,6 +36,10 @@ export default () => {
 		async (req: Request, res: Response, next: NextFunction): Promise<any> => {
 			try {
 				const { programId, exerciseId } = req.params
+				// check if programId and exerciseId are valid numbers - use zod
+				if (isNaN(parseInt(programId)) || isNaN(parseInt(exerciseId))) {
+					return next(new ValidationError('Program id must be an integer'))
+				}
 				const updated = await ProgramService.addExerciseToProgram(parseInt(exerciseId), parseInt(programId))
 				return res.json({ message: 'Exercise added to program', data: updated })
 			} catch (err) {
@@ -51,6 +56,10 @@ export default () => {
 		async (req: Request, res: Response, next: NextFunction): Promise<any> => {
 			try {
 				const { programId, exerciseId } = req.params
+				// check if programId and exerciseId are valid numbers - use zod
+				if (isNaN(parseInt(programId)) || isNaN(parseInt(exerciseId))) {
+					return next(new ValidationError('Program id must be an integer'))
+				}
 				const updated = await ProgramService.removeExerciseFromProgram(parseInt(exerciseId), parseInt(programId))
 				return res.json({ message: 'Exercise removed from program', data: updated })
 			} catch (err) {

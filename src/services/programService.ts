@@ -13,7 +13,8 @@ export class ProgramService {
 
         if (exercise.program !== null) {
             // throw with info that exercise is already assigned to a program - with names
-            throw new ValidationError(`Exercise ${exercise.name} is already assigned to a program., please remove it from the current program before adding it to another one.`);
+            throw new ValidationError(`Exercise ${exercise.name} is already assigned to a program.,
+                please remove it from the current program before adding it to another one.`);
         }
 
         const program = await Program.findByPk(programId);

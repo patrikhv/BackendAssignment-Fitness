@@ -1,5 +1,5 @@
 import http from 'http'
-import express from 'express'
+import express, {NextFunction} from 'express'
 import dotenv from 'dotenv'
 // Load environment variables from .env file
 dotenv.config();

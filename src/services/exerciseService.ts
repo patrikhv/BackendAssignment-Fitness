@@ -7,6 +7,7 @@ import {Op} from "sequelize";
 const { Exercise, Program } = models;
 
 export class ExerciseService {
+
     static async getAllWithPrograms(query: ExerciseQuery) {
         const { page, limit, programID, search } = query;
         const offset = (page - 1) * limit;

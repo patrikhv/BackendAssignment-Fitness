@@ -4,7 +4,7 @@ import {generateToken} from '../utils/jwt';
 import {AppError, ConflictError, NotFoundError, UnauthorizedError} from "../errors/appError";
 import {Op} from "sequelize";
 import {USER_ROLE} from "../utils/enums";
-import {UserLoginRequest, UserRegistrationRequest, UserRegistrationResponse} from "../types/user";
+import {UserLoginRequest, UserRegistrationRequest, UserRegistrationResponse, UserUpdateRequest} from "../types/user";
 
 const { User } = models;
 
@@ -29,7 +29,7 @@ export class UserService {
         });
 
         return {
-            id: user.id,
+            id: String(user.id),
             email: user.email,
             role: user.role,
         };
@@ -110,14 +110,7 @@ export class UserService {
         }
     }
 
-    static async update(id: number, data: {
-        name: string;
-        surname: string;
-        nickName: string;
-        email: string;
-        age: number;
-        role: 'ADMIN' | 'USER';
-    }) {
+    static async update(id: number, data: UserUpdateRequest) {
         const user = await User.findByPk(id);
         if (!user) {
             throw new NotFoundError('User not found');

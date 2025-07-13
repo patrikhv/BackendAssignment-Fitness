@@ -13,6 +13,17 @@ export const UserRegistrationRequestSchema = z.object({
 
 export type UserRegistrationRequest = z.infer<typeof UserRegistrationRequestSchema>
 
+export const UserUpdateRequestSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    surname: z.string().min(1, "Surname is required"),
+    nickName: z.string().min(1, "Nickname is required"),
+    email: z.email("Invalid email format"),
+    age: z.number().int().positive("Age must be a positive integer"),
+    role: UserRoleSchema
+})
+
+export type UserUpdateRequest = z.infer<typeof UserUpdateRequestSchema>
+
 export const UserRegistrationResponseSchema = z.object({
     id: z.string(),
     email: z.email(),

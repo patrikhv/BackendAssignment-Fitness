@@ -1,12 +1,12 @@
-import {Router} from "express";
+import {NextFunction, Request, Response, Router} from "express";
 import {UserService} from "../services/userService";
 import passport from "passport";
 import {requireRole} from "../middlewares/requireRole";
 import {USER_ROLE} from "../utils/enums";
 import {AppJwtPayload} from "../types/jwt";
-import {UnauthorizedError} from "../errors/appError";
+import {NotFoundError, UnauthorizedError} from "../errors/appError";
+import {UserLoginRequest, UserUpdateRequest, UserUpdateRequestSchema} from "../types/user";
 import {validate} from "../middlewares/validate";
-import {UserRegistrationRequestSchema} from "../types/user";
 
 
 const router = Router();
@@ -64,11 +64,15 @@ export default () => {
     // PUT /users/:id
     router.put(
         '/:id',
-        passport.authenticate('jwt', { session: false }),
+        passport.authenticate('jwt', {session: false}),
         requireRole(USER_ROLE.ADMIN),
-        async (req, res, next) => {
+        validate(UserUpdateRequestSchema),
+        async (req: Request<{id: string}, {}, UserUpdateRequest>, res: Response, next: NextFunction): Promise<void> => {
             try {
                 const id = parseInt(req.params.id);
+                if (isNaN(id)) {
+                    return next(new NotFoundError('Invalid user ID'));
+                }
                 const updatedUser = await UserService.update(id, req.body);
                 res.json({
                     message: 'User updated successfully',

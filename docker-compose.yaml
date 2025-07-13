@@ -9,18 +9,15 @@ services:
     depends_on:
       - db
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: user
-      DB_PASSWORD: password
-      DB_NAME: fitnessdb
+      DB_URL: postgresql://user:password@db:5432/fitnessdb
+      JWT_SECRET: supersecretkeysupersecretkey
     volumes:
       - .:/app
-    command: npm run dev # or npm start
+    command: npm run start
 
   db:
     image: postgres:16
-    container_name: fitness-db
+    container_name: fitness-database
     ports:
       - "5432:5432"
     environment:

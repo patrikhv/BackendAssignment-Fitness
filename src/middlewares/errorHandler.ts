@@ -1,5 +1,6 @@
 import { ErrorRequestHandler } from 'express';
 import { AppError } from "../errors/appError";
+import { logger } from '../utils/logger';
 
 export const errorHandler: ErrorRequestHandler = (
     err,
@@ -12,7 +13,7 @@ export const errorHandler: ErrorRequestHandler = (
         return;
     }
 
-    console.error('[Unhandled Error]', err);
+    logger.error('[Unhandled Error]', err);
     res.status(500).json({ message: 'Something went wrong' });
 };
 

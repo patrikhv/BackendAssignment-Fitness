@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import {UserService} from "../services/userService";
 import {validate} from "../middlewares/validate";
+import { logger } from '../utils/logger'
 import {
     UserLoginRequest,
     UserLoginRequestSchema,
@@ -19,6 +20,7 @@ export default () => {
             try {
                 const userData = await UserService.register(req.body);
 
+                logger.info('User registered successfully', { user: userData });
                 res.status(201).json({
                     message: 'User registered successfully',
                     data: userData
